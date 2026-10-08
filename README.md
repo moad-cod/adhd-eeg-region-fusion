@@ -50,6 +50,22 @@ appear in both sets. Feature scaling is fitted inside each training fold.
 The distributed CSV has already undergone artifact removal, ICA and filtering.
 The pipeline therefore does not apply a second signal filter.
 
+## Project structure
+
+```text
+src/adhd_eeg/
+├── config.py       # sampling, channels, regions, and EEG bands
+├── data.py         # validation, subject loading, and segmentation
+├── features.py     # FFT-based log-bandpower extraction
+├── evaluation.py   # subject aggregation, metrics, and plots
+└── experiment.py   # cross-validation and command-line workflow
+tests/              # focused unit tests for the core transformations
+outputs/global/     # generated cache, predictions, metrics, and figures
+```
+
+The notebook remains exploratory. The package is the reproducible source of
+truth for experiments.
+
 ## Run
 
 Create an environment and install the project:
