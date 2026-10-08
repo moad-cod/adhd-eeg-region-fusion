@@ -66,6 +66,17 @@ outputs/global/     # generated cache, predictions, metrics, and figures
 The notebook remains exploratory. The package is the reproducible source of
 truth for experiments.
 
+## Feature representation
+
+Every window starts as `1024 samples × 19 channels`. A Hann-windowed Fourier
+transform estimates power in delta (0.5–4 Hz), theta (4–8 Hz), alpha (8–13 Hz),
+beta (13–30 Hz), and lower-gamma (30–45 Hz). Integrating each band and applying
+`log10` produces `5 bands × 19 channels = 95` features.
+
+Feature names use `<band>_<channel>`, for example `theta_Fp1`. Keeping this
+representation explicit makes later regional selection a channel-filtering
+operation rather than a new preprocessing pipeline.
+
 ## Run
 
 Create an environment and install the project:
