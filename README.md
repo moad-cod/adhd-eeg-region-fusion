@@ -5,6 +5,19 @@ Chauhan and Choi (2023). The first implemented milestone is a **global baseline*
 all 19 channels are used together before individual regions or region fusion are
 compared.
 
+## Current status
+
+The global baseline is implemented and verified on the complete local dataset:
+
+| Model | Balanced accuracy | Sensitivity | Specificity | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: |
+| Logistic regression | 60.3% | 63.9% | 56.7% | 65.4% |
+| Linear SVM | 60.3% | 65.6% | 55.0% | 64.6% |
+| Gaussian Naive Bayes | 64.3% | 83.6% | 45.0% | 66.9% |
+
+These are out-of-fold results for 121 subjects and 2057 windows. They are a
+research baseline, not a clinical diagnostic result.
+
 ## Method
 
 1. Load recordings and keep every subject separate.
