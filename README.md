@@ -145,6 +145,19 @@ number alone.
 pytest
 ```
 
+## Scope and limitations
+
+- The dataset contains 121 children, so the number of independent observations
+  is 121—not the number of generated windows.
+- Bandpower is an interpretable baseline but does not represent phase,
+  connectivity, or temporal evolution within a window.
+- Results come from one dataset and need external validation before they can be
+  generalized.
+- The models support research and education only. They are not medical devices
+  and must not be used to diagnose ADHD.
+- The paper's scores are not directly comparable because preprocessing,
+  features, and validation details differ.
+
 ## Next research steps
 
 Keep the evaluation procedure fixed and change only the channel selection:
