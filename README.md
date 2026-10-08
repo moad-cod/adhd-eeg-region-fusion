@@ -163,3 +163,18 @@ pytest
 Keep the evaluation procedure fixed and change only the channel selection:
 first compare the five individual regions, then combinations of three regions,
 and finally train a leakage-safe late-fusion model from regional predictions.
+
+Suggested milestone order:
+
+1. Report each individual region against the global baseline.
+2. Evaluate the paper's ten combinations of three regions.
+3. Estimate uncertainty across folds instead of comparing only mean scores.
+4. Build late fusion from out-of-fold regional predictions.
+5. Interpret which bands and channels drive the best classical model.
+
+## Research reference
+
+N. Chauhan and B.-J. Choi, “Regional Contribution in
+Electrophysiological-Based Classifications of Attention Deficit Hyperactive
+Disorder (ADHD) Using Machine Learning,” *Computation*, vol. 11, no. 9, 2023,
+doi: [10.3390/computation11090180](https://doi.org/10.3390/computation11090180).
