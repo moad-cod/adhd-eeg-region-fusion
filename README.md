@@ -110,6 +110,19 @@ Generated artifacts go to `outputs/global/`:
 Delete the feature cache or pass `--rebuild-cache` after changing feature or
 segmentation settings.
 
+## Reading the metrics
+
+- **Sensitivity** is the fraction of ADHD subjects correctly detected.
+- **Specificity** is the fraction of control subjects correctly rejected.
+- **Balanced accuracy** averages sensitivity and specificity so one class does
+  not dominate the headline score.
+- **ROC-AUC** measures ranking quality over every possible decision threshold.
+
+Naive Bayes currently has the highest balanced accuracy, but its high
+sensitivity and low specificity mean that it over-predicts ADHD. Inspect the
+confusion matrix and subject predictions instead of selecting a model from one
+number alone.
+
 ## Tests
 
 ```bash
