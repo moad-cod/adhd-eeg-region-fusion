@@ -110,6 +110,22 @@ Generated artifacts go to `outputs/global/`:
 Delete the feature cache or pass `--rebuild-cache` after changing feature or
 segmentation settings.
 
+## Reproducibility
+
+The default experiment uses five folds and random seed 42. Record any changed
+arguments alongside reported results. To rebuild features and select models
+explicitly, run:
+
+```bash
+adhd-eeg-global --data "EEG Dataset for ADHD/adhdata.csv" \
+  --rebuild-cache --folds 5 --random-state 42 \
+  --models logistic linear_svm naive_bayes
+```
+
+Scaling is learned only from a training fold, and every window from one subject
+stays in the same fold. `metrics.json` stores the effective configuration and
+fold-level results.
+
 ## Reading the metrics
 
 - **Sensitivity** is the fraction of ADHD subjects correctly detected.
