@@ -18,6 +18,16 @@ The global baseline is implemented and verified on the complete local dataset:
 These are out-of-fold results for 121 subjects and 2057 windows. They are a
 research baseline, not a clinical diagnostic result.
 
+## Dataset contract
+
+The input is one CSV row per time sample. It must contain `Class`, `ID`, and the
+19 channels `Fp1`, `Fp2`, `F3`, `F4`, `C3`, `C4`, `P3`, `P4`, `O1`, `O2`,
+`F7`, `F8`, `T7`, `T8`, `P7`, `P8`, `Fz`, `Cz`, and `Pz`. `Class` must be
+either `ADHD` or `Control`, and every `ID` must occupy one contiguous block.
+
+The loader reads the large CSV in chunks, validates labels and numeric values,
+and yields one subject at a time instead of retaining the entire file in RAM.
+
 ## Method
 
 1. Load recordings and keep every subject separate.
