@@ -16,6 +16,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+xgboost = ["xgboost>=2.0"]
 
 [project.scripts]
 adhd-eeg-global = "adhd_eeg.experiment:main"
@@ -26,4 +27,3 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-
