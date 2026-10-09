@@ -40,4 +40,3 @@ def model_registry(
         for name, factory in MODEL_FACTORIES.items()
         if name in requested
     }
-

@@ -14,4 +14,3 @@ def create_model(random_state: int):
             random_state=random_state,
         ),
     )
-

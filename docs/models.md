@@ -19,4 +19,3 @@ runner.
 
 XGBoost is optional and imported only when requested. Install it with
 `pip install -e ".[xgboost]"`.
-

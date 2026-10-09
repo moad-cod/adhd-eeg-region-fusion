@@ -20,4 +20,3 @@ def create_model(random_state: int):
         n_jobs=-1,
         random_state=random_state,
     )
-

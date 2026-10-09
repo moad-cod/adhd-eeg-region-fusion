@@ -10,4 +10,3 @@ def create_model(random_state: int):
         StandardScaler(),
         SVC(kernel="rbf", class_weight="balanced", random_state=random_state),
     )
-

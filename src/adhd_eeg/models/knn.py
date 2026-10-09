@@ -11,4 +11,3 @@ def create_model(random_state: int):
         StandardScaler(),
         KNeighborsClassifier(n_neighbors=11, weights="distance", n_jobs=-1),
     )
-
