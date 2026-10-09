@@ -35,8 +35,8 @@ and yields one subject at a time instead of retaining the entire file in RAM.
    128 Hz); incomplete trailing samples are discarded.
 3. Compute log band power for delta, theta, alpha, beta, and lower-gamma on each
    channel (95 features per window).
-4. Evaluate logistic regression, linear SVM, and Gaussian Naive Bayes with
-   stratified, subject-grouped cross-validation.
+4. Evaluate selected classical or neural-network models with stratified,
+   subject-grouped cross-validation.
 5. Average window probabilities per subject and report subject-level balanced
    accuracy, sensitivity, specificity, F1, and ROC-AUC.
 
@@ -58,6 +58,7 @@ src/adhd_eeg/
 ├── data.py         # validation, subject loading, and segmentation
 ├── features.py     # FFT-based log-bandpower extraction
 ├── evaluation.py   # subject aggregation, metrics, and plots
+├── models/         # one model factory per classification algorithm
 └── experiment.py   # cross-validation and command-line workflow
 tests/              # focused unit tests for the core transformations
 outputs/global/     # generated cache, predictions, metrics, and figures
@@ -93,6 +94,43 @@ Run the global experiment:
 adhd-eeg-global --data "EEG Dataset for ADHD/adhdata.csv"
 ```
 
+The default run evaluates `logistic`, `linear_svm`, and `naive_bayes`. The
+additional available model names are `rbf_svm`, `random_forest`, `extra_trees`,
+`xgboost`, `knn`, and `mlp_neural_net`.
+
+Run all newly added scikit-learn models:
+
+```bash
+adhd-eeg-global --data "EEG Dataset for ADHD/adhdata.csv" \
+  --models rbf_svm random_forest extra_trees knn mlp_neural_net
+```
+
+Run one model by itself, for example the RBF SVM:
+
+```bash
+adhd-eeg-global --data "EEG Dataset for ADHD/adhdata.csv" \
+  --models rbf_svm --output outputs/rbf_svm
+```
+
+XGBoost is optional. Install and run it with:
+
+```bash
+pip install -e ".[xgboost]"
+adhd-eeg-global --data "EEG Dataset for ADHD/adhdata.csv" \
+  --models xgboost --output outputs/xgboost
+```
+
+Use a distinct `--output` directory for separate runs; otherwise the newest run
+replaces `metrics.json` and `subject_predictions.csv` in the previous directory.
+
+To evaluate every registered model after installing XGBoost:
+
+```bash
+adhd-eeg-global --data "EEG Dataset for ADHD/adhdata.csv" \
+  --models logistic linear_svm naive_bayes rbf_svm random_forest \
+  extra_trees xgboost knn mlp_neural_net
+```
+
 During development, a smaller smoke run is available:
 
 ```bash
@@ -105,7 +143,10 @@ Generated artifacts go to `outputs/global/`:
 - `features.npz`: cached window features and subject metadata
 - `metrics.json`: fold and overall subject-level metrics
 - `subject_predictions.csv`: out-of-fold predictions
-- one confusion matrix and ROC curve per model
+- `benchmark_summary.csv`: all models ranked by subject-level ROC-AUC
+- `all_models_subject_roc.png` and `.svg`: consolidated ROC comparison
+- one confusion matrix and ROC curve per model in PNG and SVG formats
+- Top-15 feature-importance plots for models with native importance values
 
 Delete the feature cache or pass `--rebuild-cache` after changing feature or
 segmentation settings.
