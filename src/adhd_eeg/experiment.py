@@ -7,35 +7,26 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from sklearn.base import clone
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedGroupKFold
-from sklearn.naive_bayes import GaussianNB
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
 
-from .evaluation import aggregate_subject_predictions, classification_metrics, save_plots
+from .evaluation import (
+    aggregate_subject_predictions,
+    benchmark_summary,
+    classification_metrics,
+    extract_feature_importance,
+    save_multi_model_roc,
+    save_plots,
+    save_top_feature_importance,
+)
 from .features import build_feature_dataset
-
-
-def model_registry(random_state: int) -> dict[str, object]:
-    return {
-        "logistic": make_pipeline(
-            StandardScaler(),
-            LogisticRegression(max_iter=2_000, class_weight="balanced", random_state=random_state),
-        ),
-        "linear_svm": make_pipeline(
-            StandardScaler(),
-            SVC(kernel="linear", class_weight="balanced", random_state=random_state),
-        ),
-        "naive_bayes": make_pipeline(StandardScaler(), GaussianNB()),
-    }
+from .models import DEFAULT_MODELS, MODEL_NAMES, model_registry
 
 
 def cross_validate_model(model, X, y, groups, folds: int, random_state: int):
     splitter = StratifiedGroupKFold(n_splits=folds, shuffle=True, random_state=random_state)
     probabilities = np.full(len(y), np.nan, dtype=float)
     fold_rows = []
+    fold_importances = []
     for fold, (train, test) in enumerate(splitter.split(X, y, groups), start=1):
         fitted = clone(model).fit(X[train], y[train])
         if hasattr(fitted, "predict_proba"):
@@ -45,12 +36,16 @@ def cross_validate_model(model, X, y, groups, folds: int, random_state: int):
             # without relying on SVC's deprecated probability=True mode.
             decision = np.clip(fitted.decision_function(X[test]), -30, 30)
             probabilities[test] = 1.0 / (1.0 + np.exp(-decision))
+        importance = extract_feature_importance(fitted)
+        if importance is not None:
+            fold_importances.append(importance)
         fold_subjects = aggregate_subject_predictions(groups[test], y[test], probabilities[test])
         fold_rows.append({"fold": fold, **classification_metrics(fold_subjects)})
     if np.isnan(probabilities).any():
         raise RuntimeError("Some samples did not receive an out-of-fold prediction")
     subjects = aggregate_subject_predictions(groups, y, probabilities)
-    return subjects, fold_rows
+    mean_importance = np.mean(fold_importances, axis=0) if fold_importances else None
+    return subjects, fold_rows, mean_importance
 
 
 def parse_args(argv=None):
@@ -59,7 +54,13 @@ def parse_args(argv=None):
     parser.add_argument("--output", type=Path, default=Path("outputs/global"))
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--random-state", type=int, default=42)
-    parser.add_argument("--models", nargs="+", choices=list(model_registry(42)), default=list(model_registry(42)))
+    parser.add_argument(
+        "--models",
+        nargs="+",
+        choices=MODEL_NAMES,
+        default=list(DEFAULT_MODELS),
+        help="Models to evaluate (default: logistic linear_svm naive_bayes)",
+    )
     parser.add_argument("--max-subjects-per-class", type=int, default=None)
     parser.add_argument("--rebuild-cache", action="store_true")
     return parser.parse_args(argv)
@@ -104,18 +105,31 @@ def main(argv=None) -> None:
         "models": {},
     }
     prediction_frames = []
-    models = model_registry(args.random_state)
+    model_predictions = {}
+    models = model_registry(args.random_state, args.models)
     for name in args.models:
         print(f"Evaluating {name}...")
-        subjects, fold_metrics = cross_validate_model(
+        subjects, fold_metrics, feature_importance = cross_validate_model(
             models[name], X, y, groups, args.folds, args.random_state
         )
         overall = classification_metrics(subjects)
         all_metrics["models"][name] = {"overall": overall, "folds": fold_metrics}
         prediction_frames.append(subjects.assign(model=name))
+        model_predictions[name] = subjects
         save_plots(subjects, name, args.output)
+        if feature_importance is not None:
+            save_top_feature_importance(
+                feature_importance,
+                dataset["feature_names"],
+                name,
+                args.output,
+            )
         print(f"  balanced accuracy={overall['balanced_accuracy']:.3f}, AUC={overall['roc_auc']:.3f}")
 
+    save_multi_model_roc(model_predictions, args.output)
+    benchmark_summary(model_predictions).to_csv(
+        args.output / "benchmark_summary.csv", index=False
+    )
     with (args.output / "metrics.json").open("w") as file:
         json.dump(all_metrics, file, indent=2)
     pd.concat(prediction_frames, ignore_index=True).to_csv(
