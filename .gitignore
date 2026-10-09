@@ -2,6 +2,5 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
-outputs/
 *.egg-info/
-
+EEG Dataset for ADHD/
