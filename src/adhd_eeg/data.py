@@ -68,4 +68,3 @@ def segment_signal(samples: np.ndarray, window_samples: int) -> np.ndarray:
     return samples[: count * window_samples].reshape(
         count, window_samples, samples.shape[1]
     )
-
