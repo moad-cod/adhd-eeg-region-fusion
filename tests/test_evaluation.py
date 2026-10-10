@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -6,6 +8,7 @@ from adhd_eeg.evaluation import (
     aggregate_subject_predictions,
     benchmark_summary,
     classification_metrics,
+    save_benchmark_summary,
     save_multi_model_roc,
     save_top_feature_importance,
 )
@@ -53,7 +56,19 @@ def test_benchmark_summary_is_sorted_by_subject_auc():
     ]
 
 
-def test_benchmark_and_feature_plots_save_png_and_svg(tmp_path):
+def test_benchmark_summary_saves_csv_and_json(tmp_path):
+    predictions = {
+        "model_a": _subject_predictions([0.1, 0.2, 0.8, 0.9]),
+        "model_b": _subject_predictions([0.2, 0.7, 0.6, 0.8]),
+    }
+    summary = save_benchmark_summary(predictions, tmp_path)
+    assert list(summary["model"]) == ["model_a", "model_b"]
+    assert (tmp_path / "benchmark_summary.csv").is_file()
+    content = json.loads((tmp_path / "benchmark_summary.json").read_text())
+    assert content["models_ranked_by_roc_auc"][0]["model"] == "model_a"
+
+
+def test_benchmark_and_feature_plots_save_png_only(tmp_path):
     predictions = {"model_a": _subject_predictions([0.1, 0.2, 0.8, 0.9])}
     save_multi_model_roc(predictions, tmp_path)
     save_top_feature_importance(
@@ -64,9 +79,8 @@ def test_benchmark_and_feature_plots_save_png_and_svg(tmp_path):
         top_n=2,
     )
     assert (tmp_path / "all_models_subject_roc.png").is_file()
-    assert (tmp_path / "all_models_subject_roc.svg").is_file()
     assert (tmp_path / "model_a_top_features.png").is_file()
-    assert (tmp_path / "model_a_top_features.svg").is_file()
+    assert not list(tmp_path.glob("*.svg"))
 
 
 def test_feature_plot_rejects_mismatched_lengths(tmp_path):
