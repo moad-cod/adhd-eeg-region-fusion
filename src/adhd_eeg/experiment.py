@@ -11,9 +11,9 @@ from sklearn.model_selection import StratifiedGroupKFold
 
 from .evaluation import (
     aggregate_subject_predictions,
-    benchmark_summary,
     classification_metrics,
     extract_feature_importance,
+    save_benchmark_summary,
     save_multi_model_roc,
     save_plots,
     save_top_feature_importance,
@@ -106,6 +106,8 @@ def main(argv=None) -> None:
     }
     prediction_frames = []
     model_predictions = {}
+    models_output_dir = args.output / "models"
+    comparison_output_dir = args.output / "comparison"
     models = model_registry(args.random_state, args.models)
     for name in args.models:
         print(f"Evaluating {name}...")
@@ -116,20 +118,19 @@ def main(argv=None) -> None:
         all_metrics["models"][name] = {"overall": overall, "folds": fold_metrics}
         prediction_frames.append(subjects.assign(model=name))
         model_predictions[name] = subjects
-        save_plots(subjects, name, args.output)
+        model_output_dir = models_output_dir / name
+        save_plots(subjects, name, model_output_dir)
         if feature_importance is not None:
             save_top_feature_importance(
                 feature_importance,
                 dataset["feature_names"],
                 name,
-                args.output,
+                model_output_dir,
             )
         print(f"  balanced accuracy={overall['balanced_accuracy']:.3f}, AUC={overall['roc_auc']:.3f}")
 
-    save_multi_model_roc(model_predictions, args.output)
-    benchmark_summary(model_predictions).to_csv(
-        args.output / "benchmark_summary.csv", index=False
-    )
+    save_multi_model_roc(model_predictions, comparison_output_dir)
+    save_benchmark_summary(model_predictions, comparison_output_dir)
     with (args.output / "metrics.json").open("w") as file:
         json.dump(all_metrics, file, indent=2)
     pd.concat(prediction_frames, ignore_index=True).to_csv(
