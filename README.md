@@ -5,18 +5,28 @@ Chauhan and Choi (2023). The first implemented milestone is a **global baseline*
 all 19 channels are used together before individual regions or region fusion are
 compared.
 
-## Current status
+## Current benchmark
 
-The global baseline is implemented and verified on the complete local dataset:
+The global experiment is implemented for nine classifiers. Results below are
+out-of-fold, subject-level estimates from 121 children and 2,057 EEG windows.
+Models are ranked by ROC-AUC.
 
-| Model | Balanced accuracy | Sensitivity | Specificity | ROC-AUC |
-| --- | ---: | ---: | ---: | ---: |
-| Logistic regression | 60.3% | 63.9% | 56.7% | 65.4% |
-| Linear SVM | 60.3% | 65.6% | 55.0% | 64.6% |
-| Gaussian Naive Bayes | 64.3% | 83.6% | 45.0% | 66.9% |
+| Rank | Model | Balanced accuracy | Sensitivity | Specificity | F1 | ROC-AUC |
+| ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | Random Forest | 66.0% | 78.7% | 53.3% | 70.1% | **73.7%** |
+| 2 | RBF SVM | **67.7%** | 80.3% | 55.0% | 71.5% | 73.3% |
+| 3 | Extra Trees | 65.1% | 86.9% | 43.3% | **71.6%** | 73.2% |
+| 4 | XGBoost | 65.2% | 82.0% | 48.3% | 70.4% | 71.9% |
+| 5 | MLP Neural Net | 66.1% | 73.8% | **58.3%** | 68.7% | 71.2% |
+| 6 | KNN | 61.8% | **88.5%** | 35.0% | 70.1% | 69.4% |
+| 7 | Gaussian Naive Bayes | 64.3% | 83.6% | 45.0% | 70.3% | 66.9% |
+| 8 | Logistic Regression | 60.3% | 63.9% | 56.7% | 61.9% | 65.4% |
+| 9 | Linear SVM | 60.3% | 65.6% | 55.0% | 62.5% | 64.6% |
 
-These are out-of-fold results for 121 subjects and 2057 windows. They are a
-research baseline, not a clinical diagnostic result.
+Random Forest provides the strongest ranking performance, while RBF SVM has the
+highest balanced accuracy. KNN is most sensitive but has low specificity,
+illustrating why no single metric should determine model selection. These are
+research results, not clinical diagnostic performance claims.
 
 ## Dataset contract
 
@@ -62,6 +72,7 @@ src/adhd_eeg/
 └── experiment.py   # cross-validation and command-line workflow
 tests/              # focused unit tests for the core transformations
 outputs/global/     # generated cache, predictions, metrics, and figures
+outputs/all_models/ # structured nine-model benchmark and comparison
 ```
 
 The notebook remains exploratory. The package is the reproducible source of
@@ -78,6 +89,170 @@ Feature names use `<band>_<channel>`, for example `theta_Fp1`. Keeping this
 representation explicit makes later regional selection a channel-filtering
 operation rather than a new preprocessing pipeline.
 
+## Scientific results and visual diagnostics
+
+### Exploratory signal characterization
+
+![Representative multichannel EEG traces for control and ADHD recordings](outputs/Signals-Vis.png)
+
+**Figure 1. Representative 3-second multichannel EEG traces.** The stacked
+traces provide a qualitative check of channel continuity, amplitude scale, and
+temporal structure. A representative trace is not a population estimate and
+must not be interpreted as proof of a diagnostic difference.
+
+![Regional EEG power spectral density](outputs/PSD-Vis.png)
+
+**Figure 2. Regional power spectral density illustration.** Spectra are grouped
+into frontal, temporal, central, parietal, and occipital regions, with theta
+(4–8 Hz) and beta (13–30 Hz) highlighted. The visible low-frequency contrast
+motivates frequency-band features; statistical conclusions require the
+subject-level cross-validation reported below.
+
+### Nine-model ROC benchmark
+
+![Publication-ready comparison of all subject-level ROC curves](outputs/all_models/comparison/all_models_subject_roc.png)
+
+**Figure 3. Subject-level ROC comparison.** Curves are ordered by ROC-AUC; the
+four strongest models are emphasized and the inset expands the clinically
+important low-FPR region. Random Forest ranks first (AUC 0.737), closely
+followed by RBF SVM (0.733) and Extra Trees (0.732). The modest separation and
+overlapping curves argue for cautious interpretation and external validation.
+
+### Per-model diagnostics
+
+Confusion matrices show threshold-dependent errors at a 0.5 subject-level
+decision threshold. ROC curves show discrimination across all thresholds.
+Feature charts report absolute standardized coefficients, native tree
+importance, or mean absolute first-layer MLP weights; their magnitudes are
+interpretable within a model, not directly comparable between model families.
+
+<details open>
+<summary><strong>Random Forest — strongest ROC-AUC (0.737)</strong></summary>
+
+| Subject-level confusion matrix | Subject-level ROC |
+| --- | --- |
+| ![Random Forest confusion matrix](outputs/all_models/models/random_forest/random_forest_confusion_matrix.png) | ![Random Forest ROC](outputs/all_models/models/random_forest/random_forest_roc.png) |
+
+![Random Forest Top-15 EEG features](outputs/all_models/models/random_forest/random_forest_top_features.png)
+
+The model emphasizes a distributed spectral signature, led by lower-gamma C3,
+alpha Cz, beta F4, and additional central/parietal features. These are
+predictive associations, not causal biomarkers.
+</details>
+
+<details>
+<summary><strong>RBF SVM — highest balanced accuracy (0.677)</strong></summary>
+
+| Subject-level confusion matrix | Subject-level ROC |
+| --- | --- |
+| ![RBF SVM confusion matrix](outputs/all_models/models/rbf_svm/rbf_svm_confusion_matrix.png) | ![RBF SVM ROC](outputs/all_models/models/rbf_svm/rbf_svm_roc.png) |
+
+The nonlinear kernel has no native per-feature importance, so interpretation is
+limited to its subject-level discrimination and error profile.
+</details>
+
+<details>
+<summary><strong>Extra Trees — ROC-AUC 0.732</strong></summary>
+
+| Subject-level confusion matrix | Subject-level ROC |
+| --- | --- |
+| ![Extra Trees confusion matrix](outputs/all_models/models/extra_trees/extra_trees_confusion_matrix.png) | ![Extra Trees ROC](outputs/all_models/models/extra_trees/extra_trees_roc.png) |
+
+![Extra Trees Top-15 EEG features](outputs/all_models/models/extra_trees/extra_trees_top_features.png)
+
+The randomized tree ensemble offers a complementary nonlinear importance
+profile. Its high sensitivity is accompanied by lower specificity.
+</details>
+
+<details>
+<summary><strong>XGBoost — ROC-AUC 0.719</strong></summary>
+
+| Subject-level confusion matrix | Subject-level ROC |
+| --- | --- |
+| ![XGBoost confusion matrix](outputs/all_models/models/xgboost/xgboost_confusion_matrix.png) | ![XGBoost ROC](outputs/all_models/models/xgboost/xgboost_roc.png) |
+
+![XGBoost Top-15 EEG features](outputs/all_models/models/xgboost/xgboost_top_features.png)
+
+Boosted-tree importance identifies the features most useful for sequential
+error correction; importance does not encode direction of association.
+</details>
+
+<details>
+<summary><strong>MLP Neural Net — ROC-AUC 0.712</strong></summary>
+
+| Subject-level confusion matrix | Subject-level ROC |
+| --- | --- |
+| ![MLP confusion matrix](outputs/all_models/models/mlp_neural_net/mlp_neural_net_confusion_matrix.png) | ![MLP ROC](outputs/all_models/models/mlp_neural_net/mlp_neural_net_roc.png) |
+
+![MLP Top-15 input features](outputs/all_models/models/mlp_neural_net/mlp_neural_net_top_features.png)
+
+The feature chart summarizes mean absolute input-to-hidden-layer weights. It is
+a diagnostic of model reliance, not a complete neural-network explanation.
+</details>
+
+<details>
+<summary><strong>KNN — highest sensitivity (0.885), ROC-AUC 0.694</strong></summary>
+
+| Subject-level confusion matrix | Subject-level ROC |
+| --- | --- |
+| ![KNN confusion matrix](outputs/all_models/models/knn/knn_confusion_matrix.png) | ![KNN ROC](outputs/all_models/models/knn/knn_roc.png) |
+
+KNN detects many ADHD subjects but produces more false positives, reflected by
+35.0% specificity. Distance-based KNN has no native feature-importance vector.
+</details>
+
+<details>
+<summary><strong>Gaussian Naive Bayes — ROC-AUC 0.669</strong></summary>
+
+| Subject-level confusion matrix | Subject-level ROC |
+| --- | --- |
+| ![Naive Bayes confusion matrix](outputs/all_models/models/naive_bayes/naive_bayes_confusion_matrix.png) | ![Naive Bayes ROC](outputs/all_models/models/naive_bayes/naive_bayes_roc.png) |
+
+The model is sensitive (83.6%) but less specific (45.0%), consistent with
+over-prediction of ADHD at the fixed threshold.
+</details>
+
+<details>
+<summary><strong>Logistic Regression — interpretable linear baseline</strong></summary>
+
+| Subject-level confusion matrix | Subject-level ROC |
+| --- | --- |
+| ![Logistic Regression confusion matrix](outputs/all_models/models/logistic/logistic_confusion_matrix.png) | ![Logistic Regression ROC](outputs/all_models/models/logistic/logistic_roc.png) |
+
+![Logistic Regression Top-15 coefficients](outputs/all_models/models/logistic/logistic_top_features.png)
+
+Absolute standardized coefficients identify the features contributing most to
+the linear decision function. Absolute values show magnitude, not direction.
+</details>
+
+<details>
+<summary><strong>Linear SVM — linear margin baseline</strong></summary>
+
+| Subject-level confusion matrix | Subject-level ROC |
+| --- | --- |
+| ![Linear SVM confusion matrix](outputs/all_models/models/linear_svm/linear_svm_confusion_matrix.png) | ![Linear SVM ROC](outputs/all_models/models/linear_svm/linear_svm_roc.png) |
+
+![Linear SVM Top-15 coefficients](outputs/all_models/models/linear_svm/linear_svm_top_features.png)
+
+The standardized linear-margin coefficients provide a sparse diagnostic of the
+features defining separation, although overall discrimination is modest.
+</details>
+
+### Original three-model baseline figures
+
+These retained figures document the initial global-baseline milestone before
+the experiment was expanded to nine classifiers.
+
+<details>
+<summary><strong>Open original baseline gallery</strong></summary>
+
+| Model | Confusion matrix | ROC curve |
+| --- | --- | --- |
+| Logistic Regression | ![Original logistic confusion matrix](outputs/global/logistic_confusion_matrix.png) | ![Original logistic ROC](outputs/global/logistic_roc.png) |
+| Linear SVM | ![Original linear SVM confusion matrix](outputs/global/linear_svm_confusion_matrix.png) | ![Original linear SVM ROC](outputs/global/linear_svm_roc.png) |
+| Gaussian Naive Bayes | ![Original Naive Bayes confusion matrix](outputs/global/naive_bayes_confusion_matrix.png) | ![Original Naive Bayes ROC](outputs/global/naive_bayes_roc.png) |
+</details>
+
 ## Run
 
 Create an environment and install the project:
@@ -87,6 +262,32 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 ```
+
+### Short Make commands
+
+Use the root `Makefile` to avoid repeating the dataset path and CLI options:
+
+```bash
+make run MODEL=random_forest
+make run MODEL=random_forest RUN_NAME=rf_final
+make smoke MODEL=rbf_svm
+```
+
+The run name becomes the output directory, such as `outputs/rf_final/`. Compare
+multiple models in one run with:
+
+```bash
+make run MODEL="logistic random_forest extra_trees" RUN_NAME=tree_comparison
+```
+
+Folds and random seed are configurable:
+
+```bash
+make run MODEL=random_forest RUN_NAME=rf_10fold FOLDS=10 SEED=123
+```
+
+Run `make help` to see the common forms. Additional CLI flags can be passed via
+`EXTRA_ARGS`, for example `EXTRA_ARGS=--rebuild-cache`.
 
 Run the global experiment:
 
@@ -138,15 +339,33 @@ adhd-eeg-global --data "EEG Dataset for ADHD/adhdata.csv" \
   --max-subjects-per-class 5 --folds 2 --models logistic
 ```
 
-Generated artifacts go to `outputs/global/`:
+Generated artifacts use a structured run directory such as
+`outputs/all_models/`:
 
 - `features.npz`: cached window features and subject metadata
 - `metrics.json`: fold and overall subject-level metrics
 - `subject_predictions.csv`: out-of-fold predictions
-- `benchmark_summary.csv`: all models ranked by subject-level ROC-AUC
-- `all_models_subject_roc.png` and `.svg`: consolidated ROC comparison
-- one confusion matrix and ROC curve per model in PNG and SVG formats
-- Top-15 feature-importance plots for models with native importance values
+- `comparison/benchmark_summary.csv`: model ranking for spreadsheets
+- `comparison/benchmark_summary.json`: the same ranking as structured JSON
+- `comparison/all_models_subject_roc.png`: consolidated ROC comparison
+- `models/<algorithm>/`: that model's confusion matrix, ROC curve, and optional
+  Top-15 feature-importance plot
+
+Example:
+
+```text
+outputs/all_models/
+├── comparison/
+│   ├── all_models_subject_roc.png
+│   ├── benchmark_summary.csv
+│   └── benchmark_summary.json
+├── models/
+│   ├── logistic/
+│   ├── random_forest/
+│   └── ...
+├── metrics.json
+└── subject_predictions.csv
+```
 
 Delete the feature cache or pass `--rebuild-cache` after changing feature or
 segmentation settings.
@@ -175,10 +394,10 @@ fold-level results.
   not dominate the headline score.
 - **ROC-AUC** measures ranking quality over every possible decision threshold.
 
-Naive Bayes currently has the highest balanced accuracy, but its high
-sensitivity and low specificity mean that it over-predicts ADHD. Inspect the
-confusion matrix and subject predictions instead of selecting a model from one
-number alone.
+RBF SVM currently has the highest balanced accuracy, while Random Forest has
+the highest ROC-AUC. Several models achieve high sensitivity by sacrificing
+specificity, so model selection must consider the confusion matrix and
+subject-level predictions rather than one headline number.
 
 ## Tests
 
