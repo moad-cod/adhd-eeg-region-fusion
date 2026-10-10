@@ -1,10 +1,14 @@
 """Subject-level metrics, benchmark plots, and model interpretability."""
 
+import json
+
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
     balanced_accuracy_score,
@@ -14,8 +18,8 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 
-PLOT_DPI = 220
-PLOT_FORMATS = ("png", "svg")
+PLOT_DPI = 300
+PLOT_FORMAT = "png"
 
 
 def aggregate_subject_predictions(
@@ -76,14 +80,29 @@ def benchmark_summary(model_predictions: dict[str, pd.DataFrame]) -> pd.DataFram
     )
 
 
+def save_benchmark_summary(
+    model_predictions: dict[str, pd.DataFrame], output_dir: Path
+) -> pd.DataFrame:
+    """Save the ranked benchmark in both tabular CSV and structured JSON."""
+    summary = benchmark_summary(model_predictions)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    summary.to_csv(output_dir / "benchmark_summary.csv", index=False)
+    with (output_dir / "benchmark_summary.json").open("w") as file:
+        json.dump(
+            {"models_ranked_by_roc_auc": summary.to_dict(orient="records")},
+            file,
+            indent=2,
+        )
+    return summary
+
+
 def _save_figure(fig, output_dir: Path, stem: str) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
-    for extension in PLOT_FORMATS:
-        fig.savefig(
-            output_dir / f"{stem}.{extension}",
-            dpi=PLOT_DPI,
-            bbox_inches="tight",
-        )
+    fig.savefig(
+        output_dir / f"{stem}.{PLOT_FORMAT}",
+        dpi=PLOT_DPI,
+        bbox_inches="tight",
+    )
 
 
 def save_plots(subjects: pd.DataFrame, model_name: str, output_dir: Path) -> None:
@@ -124,43 +143,139 @@ def save_plots(subjects: pd.DataFrame, model_name: str, output_dir: Path) -> Non
 
 
 def save_multi_model_roc(
-    model_predictions: dict[str, pd.DataFrame], output_dir: Path
+    model_predictions: dict[str, pd.DataFrame],
+    output_dir: Path,
+    *,
+    highlighted_models: int = 4,
+    include_inset: bool = True,
 ) -> None:
-    """Overlay all models' out-of-fold subject-level ROC curves."""
+    """Save a publication-ready, AUC-ranked subject-level ROC comparison."""
     if not model_predictions:
         raise ValueError("model_predictions must contain at least one model")
+    if highlighted_models < 0:
+        raise ValueError("highlighted_models cannot be negative")
 
-    colors = plt.colormaps["tab10"].resampled(len(model_predictions))
-    fig, ax = plt.subplots(figsize=(8, 6.5))
-    for index, (model_name, subjects) in enumerate(model_predictions.items()):
+    curves = []
+    for model_name, subjects in model_predictions.items():
         y = subjects["label"].to_numpy()
         probability = subjects["probability"].to_numpy()
         fpr, tpr, _ = roc_curve(y, probability)
-        auc = roc_auc_score(y, probability)
-        ax.plot(
-            fpr,
-            tpr,
-            color=colors(index),
-            linewidth=2.2,
-            label=f"{model_name} (AUC = {auc:.3f})",
+        curves.append(
+            {
+                "name": model_name,
+                "label": _display_model_name(model_name),
+                "fpr": fpr,
+                "tpr": tpr,
+                "auc": float(roc_auc_score(y, probability)),
+            }
+        )
+    curves.sort(key=lambda curve: curve["auc"], reverse=True)
+
+    top_count = min(highlighted_models, len(curves))
+    strong_colors = ["#D55E00", "#0072B2", "#009E73", "#CC79A7"]
+    if top_count > len(strong_colors):
+        strong_colors = sns.color_palette("colorblind", n_colors=top_count)
+    muted_count = len(curves) - top_count
+    muted_colors = sns.color_palette("muted", n_colors=max(muted_count, 1))
+    baseline_styles = ["--", "-.", ":"]
+
+    with sns.axes_style("whitegrid"):
+        fig, ax = plt.subplots(figsize=(11.5, 7.2))
+        inset = None
+        if include_inset:
+            inset = inset_axes(ax, width="42%", height="42%", loc="lower right", borderpad=1.4)
+
+        for index, curve in enumerate(curves):
+            is_highlighted = index < top_count
+            color = strong_colors[index] if is_highlighted else muted_colors[index - top_count]
+            line_style = "-" if is_highlighted else baseline_styles[(index - top_count) % 3]
+            line_width = 3.0 if is_highlighted else 1.5
+            alpha = 1.0 if is_highlighted else 0.58
+            label = f"{curve['label']}  (AUC = {curve['auc']:.3f})"
+            ax.step(
+                curve["fpr"],
+                curve["tpr"],
+                where="post",
+                color=color,
+                linestyle=line_style,
+                linewidth=line_width,
+                alpha=alpha,
+                label=label,
+                zorder=3 if is_highlighted else 2,
+            )
+            if inset is not None:
+                inset.step(
+                    curve["fpr"],
+                    curve["tpr"],
+                    where="post",
+                    color=color,
+                    linestyle=line_style,
+                    linewidth=2.0 if is_highlighted else 1.0,
+                    alpha=alpha,
+                )
+
+        chance_style = {
+            "color": "#666666",
+            "linestyle": "--",
+            "linewidth": 1.5,
+            "alpha": 0.7,
+        }
+        ax.plot([0, 1], [0, 1], label="Random chance  (AUC = 0.500)", **chance_style)
+        ax.set(
+            xlim=(-0.01, 1.01),
+            ylim=(-0.01, 1.01),
+            xlabel="Subject-level false positive rate",
+            ylabel="Subject-level true positive rate",
+            title="Global EEG Benchmark: Subject-Level ROC Comparison",
+        )
+        ax.set_xlabel(ax.get_xlabel(), fontsize=12)
+        ax.set_ylabel(ax.get_ylabel(), fontsize=12)
+        ax.set_title(ax.get_title(), fontsize=17, fontweight="bold", pad=14)
+        ax.tick_params(labelsize=10)
+        ax.grid(True, color="#D9D9D9", linewidth=0.8, alpha=0.65)
+        ax.legend(
+            loc="upper left",
+            bbox_to_anchor=(1.02, 1.0),
+            borderaxespad=0,
+            frameon=False,
+            fontsize=9.5,
+            title="Models ranked by ROC-AUC",
+            title_fontsize=10,
         )
 
-    ax.plot(
-        [0, 1],
-        [0, 1],
-        "--",
-        color="0.35",
-        linewidth=1.5,
-        label="Random chance (AUC = 0.50)",
-    )
-    ax.set_title("Global EEG Benchmark: Subject-Level ROC Comparison")
-    ax.set_xlabel("Subject-level false positive rate")
-    ax.set_ylabel("Subject-level true positive rate")
-    ax.grid(alpha=0.3, linestyle=":")
-    ax.legend(loc="lower right", fontsize=9)
-    fig.tight_layout()
-    _save_figure(fig, output_dir, "all_models_subject_roc")
-    plt.close(fig)
+        if inset is not None:
+            inset.plot([0, 0.3], [0, 0.3], **chance_style)
+            inset.set_xlim(0.0, 0.3)
+            inset_tpr_max = max(
+                np.max(curve["tpr"][curve["fpr"] <= 0.3]) for curve in curves
+            )
+            inset.set_ylim(0.0, min(1.0, inset_tpr_max + 0.08))
+            inset.set_title("Low-FPR region", fontsize=9, pad=4)
+            inset.set_xlabel("FPR", fontsize=8)
+            inset.set_ylabel("TPR", fontsize=8)
+            inset.tick_params(labelsize=7)
+            inset.grid(True, color="#E2E2E2", linewidth=0.6, alpha=0.7)
+            mark_inset(ax, inset, loc1=2, loc2=4, fc="none", ec="#777777", alpha=0.55)
+
+        fig.subplots_adjust(left=0.09, bottom=0.11, right=0.72, top=0.90)
+        _save_figure(fig, output_dir, "all_models_subject_roc")
+        plt.close(fig)
+
+
+def _display_model_name(model_name: str) -> str:
+    """Convert internal CLI names into publication-friendly labels."""
+    labels = {
+        "logistic": "Logistic Regression",
+        "linear_svm": "Linear SVM",
+        "naive_bayes": "Naive Bayes",
+        "rbf_svm": "RBF SVM",
+        "random_forest": "Random Forest",
+        "extra_trees": "Extra Trees",
+        "xgboost": "XGBoost",
+        "knn": "KNN",
+        "mlp_neural_net": "MLP Neural Net",
+    }
+    return labels.get(model_name, model_name.replace("_", " ").title())
 
 
 def extract_feature_importance(fitted_model) -> np.ndarray | None:
