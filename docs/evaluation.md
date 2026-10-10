@@ -8,9 +8,10 @@ The experiment writes:
 
 - `metrics.json` with configuration, fold metrics, and overall metrics;
 - `subject_predictions.csv` with every out-of-fold subject prediction;
-- `benchmark_summary.csv` ranked by subject-level ROC-AUC;
-- individual confusion matrices and ROC curves in PNG and SVG;
-- a combined subject-level ROC comparison in PNG and SVG;
+- `comparison/benchmark_summary.csv` and `.json`, ranked by subject-level
+  ROC-AUC;
+- `models/<algorithm>/` with individual confusion matrices and ROC curves;
+- `comparison/all_models_subject_roc.png` with the combined subject-level ROC;
 - Top-15 window-level EEG feature charts for interpretable models.
 
 Balanced accuracy is the primary threshold metric because it gives sensitivity
