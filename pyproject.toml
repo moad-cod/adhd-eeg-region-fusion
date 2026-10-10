@@ -12,6 +12,7 @@ dependencies = [
     "numpy>=1.26",
     "pandas>=2.1",
     "scikit-learn>=1.4",
+    "seaborn>=0.13",
 ]
 
 [project.optional-dependencies]
