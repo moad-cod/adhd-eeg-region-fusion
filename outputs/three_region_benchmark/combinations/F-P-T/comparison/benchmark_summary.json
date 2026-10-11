@@ -1,0 +1,76 @@
+{
+  "models_ranked_by_roc_auc": [
+    {
+      "model": "xgboost",
+      "balanced_accuracy": 0.6435792349726777,
+      "sensitivity": 0.7704918032786885,
+      "specificity": 0.5166666666666667,
+      "f1_score": 0.6861313868613139,
+      "roc_auc": 0.707103825136612
+    },
+    {
+      "model": "extra_trees",
+      "balanced_accuracy": 0.6594262295081967,
+      "sensitivity": 0.8688524590163934,
+      "specificity": 0.45,
+      "f1_score": 0.7210884353741497,
+      "roc_auc": 0.6997267759562842
+    },
+    {
+      "model": "random_forest",
+      "balanced_accuracy": 0.6435792349726777,
+      "sensitivity": 0.7704918032786885,
+      "specificity": 0.5166666666666667,
+      "f1_score": 0.6861313868613139,
+      "roc_auc": 0.6945355191256831
+    },
+    {
+      "model": "knn",
+      "balanced_accuracy": 0.6341530054644808,
+      "sensitivity": 0.9016393442622951,
+      "specificity": 0.36666666666666664,
+      "f1_score": 0.7142857142857143,
+      "roc_auc": 0.6942622950819672
+    },
+    {
+      "model": "rbf_svm",
+      "balanced_accuracy": 0.6191256830601093,
+      "sensitivity": 0.7049180327868853,
+      "specificity": 0.5333333333333333,
+      "f1_score": 0.6515151515151515,
+      "roc_auc": 0.6901639344262295
+    },
+    {
+      "model": "naive_bayes",
+      "balanced_accuracy": 0.6513661202185792,
+      "sensitivity": 0.8360655737704918,
+      "specificity": 0.4666666666666667,
+      "f1_score": 0.7083333333333334,
+      "roc_auc": 0.6702185792349727
+    },
+    {
+      "model": "mlp_neural_net",
+      "balanced_accuracy": 0.6274590163934426,
+      "sensitivity": 0.7049180327868853,
+      "specificity": 0.55,
+      "f1_score": 0.6564885496183206,
+      "roc_auc": 0.6677595628415302
+    },
+    {
+      "model": "logistic",
+      "balanced_accuracy": 0.644535519125683,
+      "sensitivity": 0.6557377049180327,
+      "specificity": 0.6333333333333333,
+      "f1_score": 0.6504065040650406,
+      "roc_auc": 0.6636612021857924
+    },
+    {
+      "model": "linear_svm",
+      "balanced_accuracy": 0.6278688524590164,
+      "sensitivity": 0.6557377049180327,
+      "specificity": 0.6,
+      "f1_score": 0.64,
+      "roc_auc": 0.6519125683060109
+    }
+  ]
+}
