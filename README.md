@@ -5,7 +5,24 @@ Chauhan and Choi (2023). The first implemented milestone is a **global baseline*
 all 19 channels are used together before individual regions or region fusion are
 compared.
 
-## Current benchmark
+The study is organized around three questions: the global five-region baseline,
+the paper's sets of three regions, and the contribution of each individual
+region. See the [experimental roadmap](docs/experiment.md) for the complete
+design and interpretation plan.
+
+## Experiment status
+
+| Research question | Representation | Status | Main visual evidence |
+| --- | --- | --- | --- |
+| 1. Global baseline | Five regions, 19 channels, 95 features | Complete | Nine-model ROC comparison and per-model diagnostics |
+| 2. Three-region subsets | Ten unique three-region combinations | Complete | Combination heatmap and global-versus-best comparison |
+| 3. Individual regions | Five separate anatomical regions | Not yet implemented | No result figures yet |
+
+The figures shown below are generated artifacts from the corresponding
+experiments, not manually entered illustrations. The complete experimental
+logic is documented in the [experimental roadmap](docs/experiment.md).
+
+## Question 1 — Global five-region benchmark
 
 The global experiment is implemented for nine classifiers. Results below are
 out-of-fold, subject-level estimates from 121 children and 2,057 EEG windows.
@@ -73,6 +90,7 @@ src/adhd_eeg/
 tests/              # focused unit tests for the core transformations
 outputs/global/     # generated cache, predictions, metrics, and figures
 outputs/all_models/ # structured nine-model benchmark and comparison
+outputs/three_region_benchmark/ # regional results and comparison figures
 ```
 
 The notebook remains exploratory. The package is the reproducible source of
@@ -253,6 +271,49 @@ the experiment was expanded to nine classifiers.
 | Gaussian Naive Bayes | ![Original Naive Bayes confusion matrix](outputs/global/naive_bayes_confusion_matrix.png) | ![Original Naive Bayes ROC](outputs/global/naive_bayes_roc.png) |
 </details>
 
+## Question 2 — Three-region experiment
+
+The regional benchmark evaluates all ten unique selections of three regions
+with all nine classifiers, producing 90 subject-level results. It reuses the
+same folds, random seed, feature extraction, and subject aggregation as the
+global experiment so that channel selection is the principal changed factor.
+
+![ROC-AUC heatmap for every model and three-region combination](outputs/three_region_benchmark/comparison/region_combination_heatmap.png)
+
+**Figure 4. Subject-level ROC-AUC across the three-region search space.** Each
+cell represents one classifier and one regional subset. The heatmap should be
+used to assess whether a result is consistent across several models, rather
+than selecting a region solely from one unusually high cell. The highest
+observed ROC-AUC is 0.778 for RBF SVM with Central-Parietal-Occipital (C-P-O).
+
+![Global five-region models compared with their best three-region subsets](outputs/three_region_benchmark/comparison/global_vs_best_three_regions.png)
+
+**Figure 5. Best three-region result versus the global baseline for each
+model.** All nine classifiers obtain a higher observed ROC-AUC from
+their best three-region subset. The largest increase is for Linear SVM with
+C-P-O (0.646 to 0.729, ΔAUC = +0.083). RBF SVM with C-P-O provides the
+strongest absolute regional result (AUC 0.778 versus 0.733 globally). Because
+the best subset is selected from ten candidates on the same cross-validation
+results, these differences are exploratory and require confidence intervals or
+nested validation before being described as generalizable improvements.
+
+The machine-readable regional evidence is available in
+[`three_region_summary.csv`](outputs/three_region_benchmark/comparison/three_region_summary.csv),
+[`three_region_summary.json`](outputs/three_region_benchmark/comparison/three_region_summary.json),
+and the
+[`global_vs_best_three_regions.csv`](outputs/three_region_benchmark/comparison/global_vs_best_three_regions.csv)
+comparison. Each folder under
+[`outputs/three_region_benchmark/combinations/`](outputs/three_region_benchmark/combinations/)
+contains the combined ROC plot plus the confusion matrix, ROC curve, and
+available feature-importance figure for every model in that combination.
+
+## Question 3 — Individual-region experiment
+
+The single-region benchmark has not yet been implemented or run. It will
+evaluate Frontal, Central, Parietal, Temporal, and Occipital features
+independently under the same validation design. No one-region image is shown in
+this README until that experiment produces real results.
+
 ## Run
 
 Create an environment and install the project:
@@ -288,6 +349,33 @@ make run MODEL=random_forest RUN_NAME=rf_10fold FOLDS=10 SEED=123
 
 Run `make help` to see the common forms. Additional CLI flags can be passed via
 `EXTRA_ARGS`, for example `EXTRA_ARGS=--rebuild-cache`.
+
+### Three-region experiment
+
+The paper's main regional experiment evaluates all ten sets of three regions
+while preserving the same subject folds used by the global baseline:
+
+```bash
+make regions \
+  MODEL="logistic linear_svm naive_bayes rbf_svm random_forest extra_trees xgboost knn mlp_neural_net"
+```
+
+Run a fast implementation check on two combinations:
+
+```bash
+make regions-smoke MODEL=logistic COMBINATIONS="F-C-P F-T-O"
+```
+
+Regional outputs are written under `outputs/three_region_benchmark/`, including
+a model-by-combination ROC-AUC heatmap and global-versus-best-subset CSV, JSON,
+and PNG comparisons. The command validates that global and regional folds and
+random seeds match before comparing scores. See
+[the three-region experiment guide](docs/three-region-experiment.md) for the
+combination design and interpretation limits.
+
+The full run checkpoints every completed model. If it is interrupted, execute
+the same `make regions ...` command to resume instead of repeating finished
+work.
 
 Run the global experiment:
 
@@ -420,15 +508,15 @@ pytest
 
 ## Next research steps
 
-Keep the evaluation procedure fixed and change only the channel selection:
-first compare the five individual regions, then combinations of three regions,
-and finally train a leakage-safe late-fusion model from regional predictions.
+Keep the evaluation procedure fixed and change only the channel selection. The
+global and three-region benchmarks are complete; the next direct experiment is
+the individual-region benchmark.
 
 Suggested milestone order:
 
-1. Report each individual region against the global baseline.
-2. Evaluate the paper's ten combinations of three regions.
-3. Estimate uncertainty across folds instead of comparing only mean scores.
+1. Implement and report each individual region against the global baseline.
+2. Estimate uncertainty for global-versus-regional differences.
+3. Use nested validation if selecting and reporting the best regional subset.
 4. Build late fusion from out-of-fold regional predictions.
 5. Interpret which bands and channels drive the best classical model.
 
