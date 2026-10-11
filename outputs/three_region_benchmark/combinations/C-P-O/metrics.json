@@ -1,0 +1,533 @@
+{
+  "configuration": {
+    "combination": "C-P-O",
+    "channels": [
+      "C3",
+      "C4",
+      "Cz",
+      "P3",
+      "P4",
+      "Pz",
+      "O1",
+      "O2"
+    ],
+    "feature_count": 40,
+    "folds": 5,
+    "random_state": 42
+  },
+  "models": {
+    "logistic": {
+      "overall": {
+        "subjects": 121,
+        "balanced_accuracy": 0.6688524590163935,
+        "sensitivity": 0.7377049180327869,
+        "specificity": 0.6,
+        "f1": 0.6923076923076923,
+        "roc_auc": 0.709016393442623
+      },
+      "folds": [
+        {
+          "fold": 1,
+          "subjects": 24,
+          "balanced_accuracy": 0.7916666666666667,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.75,
+          "f1": 0.8,
+          "roc_auc": 0.875
+        },
+        {
+          "fold": 2,
+          "subjects": 25,
+          "balanced_accuracy": 0.6378205128205128,
+          "sensitivity": 0.6923076923076923,
+          "specificity": 0.5833333333333334,
+          "f1": 0.6666666666666666,
+          "roc_auc": 0.6282051282051282
+        },
+        {
+          "fold": 3,
+          "subjects": 24,
+          "balanced_accuracy": 0.5833333333333334,
+          "sensitivity": 0.4166666666666667,
+          "specificity": 0.75,
+          "f1": 0.5,
+          "roc_auc": 0.6527777777777778
+        },
+        {
+          "fold": 4,
+          "subjects": 24,
+          "balanced_accuracy": 0.6666666666666666,
+          "sensitivity": 0.9166666666666666,
+          "specificity": 0.4166666666666667,
+          "f1": 0.7333333333333333,
+          "roc_auc": 0.6944444444444444
+        },
+        {
+          "fold": 5,
+          "subjects": 24,
+          "balanced_accuracy": 0.6666666666666667,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.5,
+          "f1": 0.7142857142857143,
+          "roc_auc": 0.6875
+        }
+      ]
+    },
+    "linear_svm": {
+      "overall": {
+        "subjects": 121,
+        "balanced_accuracy": 0.6689890710382513,
+        "sensitivity": 0.7213114754098361,
+        "specificity": 0.6166666666666667,
+        "f1": 0.6875,
+        "roc_auc": 0.7289617486338797
+      },
+      "folds": [
+        {
+          "fold": 1,
+          "subjects": 24,
+          "balanced_accuracy": 0.7916666666666667,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.75,
+          "f1": 0.8,
+          "roc_auc": 0.8819444444444445
+        },
+        {
+          "fold": 2,
+          "subjects": 25,
+          "balanced_accuracy": 0.5993589743589745,
+          "sensitivity": 0.6153846153846154,
+          "specificity": 0.5833333333333334,
+          "f1": 0.6153846153846154,
+          "roc_auc": 0.6666666666666666
+        },
+        {
+          "fold": 3,
+          "subjects": 24,
+          "balanced_accuracy": 0.625,
+          "sensitivity": 0.5,
+          "specificity": 0.75,
+          "f1": 0.5714285714285714,
+          "roc_auc": 0.6805555555555556
+        },
+        {
+          "fold": 4,
+          "subjects": 24,
+          "balanced_accuracy": 0.6666666666666667,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.5,
+          "f1": 0.7142857142857143,
+          "roc_auc": 0.6875
+        },
+        {
+          "fold": 5,
+          "subjects": 24,
+          "balanced_accuracy": 0.6666666666666667,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.5,
+          "f1": 0.7142857142857143,
+          "roc_auc": 0.6875
+        }
+      ]
+    },
+    "naive_bayes": {
+      "overall": {
+        "subjects": 121,
+        "balanced_accuracy": 0.6594262295081967,
+        "sensitivity": 0.8688524590163934,
+        "specificity": 0.45,
+        "f1": 0.7210884353741497,
+        "roc_auc": 0.6653005464480874
+      },
+      "folds": [
+        {
+          "fold": 1,
+          "subjects": 24,
+          "balanced_accuracy": 0.5416666666666667,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.25,
+          "f1": 0.6451612903225806,
+          "roc_auc": 0.5625
+        },
+        {
+          "fold": 2,
+          "subjects": 25,
+          "balanced_accuracy": 0.7115384615384616,
+          "sensitivity": 0.9230769230769231,
+          "specificity": 0.5,
+          "f1": 0.7741935483870968,
+          "roc_auc": 0.6474358974358975
+        },
+        {
+          "fold": 3,
+          "subjects": 24,
+          "balanced_accuracy": 0.625,
+          "sensitivity": 0.6666666666666666,
+          "specificity": 0.5833333333333334,
+          "f1": 0.64,
+          "roc_auc": 0.7083333333333334
+        },
+        {
+          "fold": 4,
+          "subjects": 24,
+          "balanced_accuracy": 0.6666666666666666,
+          "sensitivity": 0.9166666666666666,
+          "specificity": 0.4166666666666667,
+          "f1": 0.7333333333333333,
+          "roc_auc": 0.6319444444444444
+        },
+        {
+          "fold": 5,
+          "subjects": 24,
+          "balanced_accuracy": 0.75,
+          "sensitivity": 1.0,
+          "specificity": 0.5,
+          "f1": 0.8,
+          "roc_auc": 0.7638888888888888
+        }
+      ]
+    },
+    "rbf_svm": {
+      "overall": {
+        "subjects": 121,
+        "balanced_accuracy": 0.6848360655737705,
+        "sensitivity": 0.819672131147541,
+        "specificity": 0.55,
+        "f1": 0.7246376811594203,
+        "roc_auc": 0.7781420765027323
+      },
+      "folds": [
+        {
+          "fold": 1,
+          "subjects": 24,
+          "balanced_accuracy": 0.6666666666666667,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.5,
+          "f1": 0.7142857142857143,
+          "roc_auc": 0.7222222222222222
+        },
+        {
+          "fold": 2,
+          "subjects": 25,
+          "balanced_accuracy": 0.7948717948717949,
+          "sensitivity": 0.9230769230769231,
+          "specificity": 0.6666666666666666,
+          "f1": 0.8275862068965517,
+          "roc_auc": 0.9230769230769231
+        },
+        {
+          "fold": 3,
+          "subjects": 24,
+          "balanced_accuracy": 0.625,
+          "sensitivity": 0.5833333333333334,
+          "specificity": 0.6666666666666666,
+          "f1": 0.6086956521739131,
+          "roc_auc": 0.7013888888888888
+        },
+        {
+          "fold": 4,
+          "subjects": 24,
+          "balanced_accuracy": 0.625,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.4166666666666667,
+          "f1": 0.6896551724137931,
+          "roc_auc": 0.6805555555555556
+        },
+        {
+          "fold": 5,
+          "subjects": 24,
+          "balanced_accuracy": 0.7083333333333333,
+          "sensitivity": 0.9166666666666666,
+          "specificity": 0.5,
+          "f1": 0.7586206896551724,
+          "roc_auc": 0.8263888888888888
+        }
+      ]
+    },
+    "random_forest": {
+      "overall": {
+        "subjects": 121,
+        "balanced_accuracy": 0.6683060109289618,
+        "sensitivity": 0.8032786885245902,
+        "specificity": 0.5333333333333333,
+        "f1": 0.7101449275362319,
+        "roc_auc": 0.7740437158469945
+      },
+      "folds": [
+        {
+          "fold": 1,
+          "subjects": 24,
+          "balanced_accuracy": 0.625,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.4166666666666667,
+          "f1": 0.6896551724137931,
+          "roc_auc": 0.7222222222222222
+        },
+        {
+          "fold": 2,
+          "subjects": 25,
+          "balanced_accuracy": 0.7532051282051282,
+          "sensitivity": 0.9230769230769231,
+          "specificity": 0.5833333333333334,
+          "f1": 0.8,
+          "roc_auc": 0.903846153846154
+        },
+        {
+          "fold": 3,
+          "subjects": 24,
+          "balanced_accuracy": 0.5833333333333333,
+          "sensitivity": 0.5,
+          "specificity": 0.6666666666666666,
+          "f1": 0.5454545454545454,
+          "roc_auc": 0.6597222222222223
+        },
+        {
+          "fold": 4,
+          "subjects": 24,
+          "balanced_accuracy": 0.6666666666666667,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.5,
+          "f1": 0.7142857142857143,
+          "roc_auc": 0.7222222222222222
+        },
+        {
+          "fold": 5,
+          "subjects": 24,
+          "balanced_accuracy": 0.7083333333333333,
+          "sensitivity": 0.9166666666666666,
+          "specificity": 0.5,
+          "f1": 0.7586206896551724,
+          "roc_auc": 0.8819444444444444
+        }
+      ]
+    },
+    "extra_trees": {
+      "overall": {
+        "subjects": 121,
+        "balanced_accuracy": 0.6926229508196722,
+        "sensitivity": 0.8852459016393442,
+        "specificity": 0.5,
+        "f1": 0.7448275862068966,
+        "roc_auc": 0.7620218579234973
+      },
+      "folds": [
+        {
+          "fold": 1,
+          "subjects": 24,
+          "balanced_accuracy": 0.625,
+          "sensitivity": 0.9166666666666666,
+          "specificity": 0.3333333333333333,
+          "f1": 0.7096774193548387,
+          "roc_auc": 0.7569444444444445
+        },
+        {
+          "fold": 2,
+          "subjects": 25,
+          "balanced_accuracy": 0.7532051282051282,
+          "sensitivity": 0.9230769230769231,
+          "specificity": 0.5833333333333334,
+          "f1": 0.8,
+          "roc_auc": 0.9102564102564104
+        },
+        {
+          "fold": 3,
+          "subjects": 24,
+          "balanced_accuracy": 0.7083333333333334,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.5833333333333334,
+          "f1": 0.7407407407407407,
+          "roc_auc": 0.6805555555555555
+        },
+        {
+          "fold": 4,
+          "subjects": 24,
+          "balanced_accuracy": 0.6666666666666667,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.5,
+          "f1": 0.7142857142857143,
+          "roc_auc": 0.6736111111111112
+        },
+        {
+          "fold": 5,
+          "subjects": 24,
+          "balanced_accuracy": 0.7083333333333333,
+          "sensitivity": 0.9166666666666666,
+          "specificity": 0.5,
+          "f1": 0.7586206896551724,
+          "roc_auc": 0.8541666666666667
+        }
+      ]
+    },
+    "xgboost": {
+      "overall": {
+        "subjects": 121,
+        "balanced_accuracy": 0.6763661202185793,
+        "sensitivity": 0.8360655737704918,
+        "specificity": 0.5166666666666667,
+        "f1": 0.723404255319149,
+        "roc_auc": 0.7508196721311476
+      },
+      "folds": [
+        {
+          "fold": 1,
+          "subjects": 24,
+          "balanced_accuracy": 0.5416666666666667,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.25,
+          "f1": 0.6451612903225806,
+          "roc_auc": 0.7291666666666667
+        },
+        {
+          "fold": 2,
+          "subjects": 25,
+          "balanced_accuracy": 0.7115384615384616,
+          "sensitivity": 0.9230769230769231,
+          "specificity": 0.5,
+          "f1": 0.7741935483870968,
+          "roc_auc": 0.9230769230769231
+        },
+        {
+          "fold": 3,
+          "subjects": 24,
+          "balanced_accuracy": 0.625,
+          "sensitivity": 0.5,
+          "specificity": 0.75,
+          "f1": 0.5714285714285714,
+          "roc_auc": 0.6388888888888888
+        },
+        {
+          "fold": 4,
+          "subjects": 24,
+          "balanced_accuracy": 0.7083333333333333,
+          "sensitivity": 0.9166666666666666,
+          "specificity": 0.5,
+          "f1": 0.7586206896551724,
+          "roc_auc": 0.7291666666666666
+        },
+        {
+          "fold": 5,
+          "subjects": 24,
+          "balanced_accuracy": 0.7916666666666667,
+          "sensitivity": 1.0,
+          "specificity": 0.5833333333333334,
+          "f1": 0.8275862068965517,
+          "roc_auc": 0.8263888888888888
+        }
+      ]
+    },
+    "knn": {
+      "overall": {
+        "subjects": 121,
+        "balanced_accuracy": 0.6341530054644808,
+        "sensitivity": 0.9016393442622951,
+        "specificity": 0.36666666666666664,
+        "f1": 0.7142857142857143,
+        "roc_auc": 0.6777322404371585
+      },
+      "folds": [
+        {
+          "fold": 1,
+          "subjects": 24,
+          "balanced_accuracy": 0.5833333333333333,
+          "sensitivity": 0.9166666666666666,
+          "specificity": 0.25,
+          "f1": 0.6875,
+          "roc_auc": 0.5694444444444444
+        },
+        {
+          "fold": 2,
+          "subjects": 25,
+          "balanced_accuracy": 0.6282051282051282,
+          "sensitivity": 0.9230769230769231,
+          "specificity": 0.3333333333333333,
+          "f1": 0.7272727272727273,
+          "roc_auc": 0.8012820512820513
+        },
+        {
+          "fold": 3,
+          "subjects": 24,
+          "balanced_accuracy": 0.625,
+          "sensitivity": 0.9166666666666666,
+          "specificity": 0.3333333333333333,
+          "f1": 0.7096774193548387,
+          "roc_auc": 0.6006944444444444
+        },
+        {
+          "fold": 4,
+          "subjects": 24,
+          "balanced_accuracy": 0.625,
+          "sensitivity": 0.8333333333333334,
+          "specificity": 0.4166666666666667,
+          "f1": 0.6896551724137931,
+          "roc_auc": 0.6319444444444444
+        },
+        {
+          "fold": 5,
+          "subjects": 24,
+          "balanced_accuracy": 0.7083333333333333,
+          "sensitivity": 0.9166666666666666,
+          "specificity": 0.5,
+          "f1": 0.7586206896551724,
+          "roc_auc": 0.75
+        }
+      ]
+    },
+    "mlp_neural_net": {
+      "overall": {
+        "subjects": 121,
+        "balanced_accuracy": 0.6434426229508197,
+        "sensitivity": 0.7868852459016393,
+        "specificity": 0.5,
+        "f1": 0.6906474820143885,
+        "roc_auc": 0.7218579234972677
+      },
+      "folds": [
+        {
+          "fold": 1,
+          "subjects": 24,
+          "balanced_accuracy": 0.5416666666666666,
+          "sensitivity": 0.75,
+          "specificity": 0.3333333333333333,
+          "f1": 0.6206896551724138,
+          "roc_auc": 0.6805555555555556
+        },
+        {
+          "fold": 2,
+          "subjects": 25,
+          "balanced_accuracy": 0.7115384615384616,
+          "sensitivity": 0.9230769230769231,
+          "specificity": 0.5,
+          "f1": 0.7741935483870968,
+          "roc_auc": 0.8525641025641025
+        },
+        {
+          "fold": 3,
+          "subjects": 24,
+          "balanced_accuracy": 0.5,
+          "sensitivity": 0.4166666666666667,
+          "specificity": 0.5833333333333334,
+          "f1": 0.45454545454545453,
+          "roc_auc": 0.6319444444444444
+        },
+        {
+          "fold": 4,
+          "subjects": 24,
+          "balanced_accuracy": 0.7083333333333333,
+          "sensitivity": 0.9166666666666666,
+          "specificity": 0.5,
+          "f1": 0.7586206896551724,
+          "roc_auc": 0.6458333333333334
+        },
+        {
+          "fold": 5,
+          "subjects": 24,
+          "balanced_accuracy": 0.75,
+          "sensitivity": 0.9166666666666666,
+          "specificity": 0.5833333333333334,
+          "f1": 0.7857142857142857,
+          "roc_auc": 0.8263888888888888
+        }
+      ]
+    }
+  }
+}
