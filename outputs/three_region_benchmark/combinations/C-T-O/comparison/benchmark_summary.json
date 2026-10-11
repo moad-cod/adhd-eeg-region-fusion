@@ -1,0 +1,76 @@
+{
+  "models_ranked_by_roc_auc": [
+    {
+      "model": "extra_trees",
+      "balanced_accuracy": 0.6430327868852459,
+      "sensitivity": 0.8360655737704918,
+      "specificity": 0.45,
+      "f1_score": 0.7034482758620689,
+      "roc_auc": 0.7685792349726777
+    },
+    {
+      "model": "random_forest",
+      "balanced_accuracy": 0.6849726775956284,
+      "sensitivity": 0.8032786885245902,
+      "specificity": 0.5666666666666667,
+      "f1_score": 0.7205882352941176,
+      "roc_auc": 0.7683060109289619
+    },
+    {
+      "model": "rbf_svm",
+      "balanced_accuracy": 0.6605191256830601,
+      "sensitivity": 0.7377049180327869,
+      "specificity": 0.5833333333333334,
+      "f1_score": 0.6870229007633588,
+      "roc_auc": 0.7549180327868854
+    },
+    {
+      "model": "knn",
+      "balanced_accuracy": 0.6513661202185792,
+      "sensitivity": 0.8360655737704918,
+      "specificity": 0.4666666666666667,
+      "f1_score": 0.7083333333333334,
+      "roc_auc": 0.7483606557377049
+    },
+    {
+      "model": "xgboost",
+      "balanced_accuracy": 0.6269125683060109,
+      "sensitivity": 0.7704918032786885,
+      "specificity": 0.48333333333333334,
+      "f1_score": 0.6762589928057554,
+      "roc_auc": 0.7314207650273225
+    },
+    {
+      "model": "mlp_neural_net",
+      "balanced_accuracy": 0.6935792349726776,
+      "sensitivity": 0.7704918032786885,
+      "specificity": 0.6166666666666667,
+      "f1_score": 0.7175572519083969,
+      "roc_auc": 0.7185792349726776
+    },
+    {
+      "model": "logistic",
+      "balanced_accuracy": 0.6030054644808743,
+      "sensitivity": 0.639344262295082,
+      "specificity": 0.5666666666666667,
+      "f1_score": 0.6190476190476191,
+      "roc_auc": 0.6967213114754098
+    },
+    {
+      "model": "linear_svm",
+      "balanced_accuracy": 0.6112021857923498,
+      "sensitivity": 0.6557377049180327,
+      "specificity": 0.5666666666666667,
+      "f1_score": 0.6299212598425197,
+      "roc_auc": 0.6961748633879782
+    },
+    {
+      "model": "naive_bayes",
+      "balanced_accuracy": 0.6181693989071039,
+      "sensitivity": 0.819672131147541,
+      "specificity": 0.4166666666666667,
+      "f1_score": 0.684931506849315,
+      "roc_auc": 0.6726775956284153
+    }
+  ]
+}
