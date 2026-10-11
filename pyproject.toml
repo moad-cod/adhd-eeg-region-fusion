@@ -21,6 +21,7 @@ xgboost = ["xgboost>=2.0"]
 
 [project.scripts]
 adhd-eeg-global = "adhd_eeg.experiment:main"
+adhd-eeg-three-regions = "adhd_eeg.regional_experiment:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
