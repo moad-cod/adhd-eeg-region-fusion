@@ -1,0 +1,85 @@
+{
+  "comparison": [
+    {
+      "model": "rbf_svm",
+      "best_single_region": "parietal",
+      "single_region_roc_auc": 0.7546448087431693,
+      "global_roc_auc": 0.7325136612021859,
+      "best_three_regions": "C-P-O",
+      "three_region_roc_auc": 0.7781420765027323,
+      "single_minus_global_auc": 0.022131147540983442
+    },
+    {
+      "model": "extra_trees",
+      "best_single_region": "temporal",
+      "single_region_roc_auc": 0.7319672131147541,
+      "global_roc_auc": 0.7319672131147541,
+      "best_three_regions": "C-T-O",
+      "three_region_roc_auc": 0.7685792349726777,
+      "single_minus_global_auc": 0.0
+    },
+    {
+      "model": "linear_svm",
+      "best_single_region": "temporal",
+      "single_region_roc_auc": 0.7273224043715847,
+      "global_roc_auc": 0.646174863387978,
+      "best_three_regions": "C-P-O",
+      "three_region_roc_auc": 0.7289617486338797,
+      "single_minus_global_auc": 0.08114754098360666
+    },
+    {
+      "model": "logistic",
+      "best_single_region": "temporal",
+      "single_region_roc_auc": 0.726775956284153,
+      "global_roc_auc": 0.6540983606557377,
+      "best_three_regions": "F-T-O",
+      "three_region_roc_auc": 0.7278688524590164,
+      "single_minus_global_auc": 0.07267759562841536
+    },
+    {
+      "model": "random_forest",
+      "best_single_region": "central",
+      "single_region_roc_auc": 0.7256830601092896,
+      "global_roc_auc": 0.7374316939890709,
+      "best_three_regions": "C-P-O",
+      "three_region_roc_auc": 0.7740437158469945,
+      "single_minus_global_auc": -0.011748633879781312
+    },
+    {
+      "model": "xgboost",
+      "best_single_region": "central",
+      "single_region_roc_auc": 0.7199453551912568,
+      "global_roc_auc": 0.7188524590163934,
+      "best_three_regions": "C-P-T",
+      "three_region_roc_auc": 0.7546448087431694,
+      "single_minus_global_auc": 0.0010928961748634114
+    },
+    {
+      "model": "knn",
+      "best_single_region": "temporal",
+      "single_region_roc_auc": 0.7142076502732241,
+      "global_roc_auc": 0.6939890710382514,
+      "best_three_regions": "C-T-O",
+      "three_region_roc_auc": 0.7483606557377049,
+      "single_minus_global_auc": 0.020218579234972722
+    },
+    {
+      "model": "mlp_neural_net",
+      "best_single_region": "temporal",
+      "single_region_roc_auc": 0.7073770491803278,
+      "global_roc_auc": 0.7117486338797815,
+      "best_three_regions": "F-C-O",
+      "three_region_roc_auc": 0.7297814207650273,
+      "single_minus_global_auc": -0.004371584699453646
+    },
+    {
+      "model": "naive_bayes",
+      "best_single_region": "central",
+      "single_region_roc_auc": 0.6836065573770491,
+      "global_roc_auc": 0.6685792349726776,
+      "best_three_regions": "F-C-P",
+      "three_region_roc_auc": 0.6759562841530055,
+      "single_minus_global_auc": 0.015027322404371546
+    }
+  ]
+}
