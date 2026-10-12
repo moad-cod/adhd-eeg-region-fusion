@@ -87,7 +87,7 @@ Primary outputs:
 - global-versus-best-three-region comparison;
 - per-combination predictions, metrics, ROC curves, and confusion matrices.
 
-## Question 3 — Individual-region contribution
+## Question 3 — Standalone predictive value of individual regions
 
 > How much discriminative information does each brain region provide when used
 > alone?
@@ -114,6 +114,12 @@ Primary outputs:
 - comparison with the global baseline;
 - comparison between individual regions and the best three-region subset.
 
+This experiment is complete. Across the 45 model-region evaluations, Parietal
+with RBF SVM has the highest standalone ROC-AUC (0.755), and Parietal with
+XGBoost has the highest balanced accuracy (0.701). The best single-region score
+is model-dependent, and selected maxima remain exploratory until evaluated
+with nested validation or paired uncertainty estimates.
+
 ## Final interpretation
 
 The three questions provide different levels of evidence:
@@ -126,10 +132,11 @@ Three-region experiment
     tests whether fewer regions preserve or improve performance
 
 One-region experiment
-    explains the contribution of each anatomical region
+    measures the standalone predictive value of each anatomical region
 ```
 
 The final conclusion should report whether the best three-region subset exceeds
-the global baseline, which individual regions contribute most, and whether the
-performance gain is large and stable enough to justify using fewer electrodes.
+the global baseline, which individual regions have the greatest standalone
+predictive value, and whether the performance gain is large and stable enough
+to justify using fewer electrodes.
 
