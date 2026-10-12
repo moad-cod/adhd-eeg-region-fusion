@@ -8,13 +8,16 @@ MPLCONFIGDIR ?= /tmp/adhd-eeg-matplotlib
 EXTRA_ARGS ?=
 COMBINATIONS ?=
 REGION_RUN_NAME ?= three_region_benchmark
+SINGLE_REGION_RUN_NAME ?= single_region_benchmark
+SINGLE_REGIONS ?=
 
 empty :=
 space := $(empty) $(empty)
 RUN_NAME := $(if $(strip $(RUN_NAME)),$(RUN_NAME),$(subst $(space),_,$(strip $(MODEL))))
 REGION_COMBINATION_ARGS := $(if $(strip $(COMBINATIONS)),--combinations $(COMBINATIONS),)
+SINGLE_REGION_ARGS := $(if $(strip $(SINGLE_REGIONS)),--regions $(SINGLE_REGIONS),)
 
-.PHONY: help run smoke regions regions-smoke
+.PHONY: help run smoke regions regions-smoke single-regions single-regions-smoke
 
 help:
 	@echo "ADHD EEG experiment commands"
@@ -25,6 +28,8 @@ help:
 	@echo "  make smoke MODEL=rbf_svm"
 	@echo "  make regions MODEL='random_forest rbf_svm'"
 	@echo "  make regions-smoke MODEL=logistic COMBINATIONS='F-C-P F-T-O'"
+	@echo "  make single-regions MODEL='random_forest rbf_svm'"
+	@echo "  make single-regions-smoke MODEL=logistic SINGLE_REGIONS='frontal occipital'"
 	@echo ""
 	@echo "Optional variables: RUN_NAME, FOLDS, SEED, DATA, PYTHON_ENV, EXTRA_ARGS"
 
@@ -34,7 +39,8 @@ run:
 		--models $(MODEL) \
 		--folds $(FOLDS) \
 		--random-state $(SEED) \
-		--output "outputs/$(RUN_NAME)" $(EXTRA_ARGS)
+		--output "outputs/$(RUN_NAME)" \
+		--comparison-output "outputs/comparisons/$(RUN_NAME)_models" $(EXTRA_ARGS)
 
 smoke:
 	MPLCONFIGDIR="$(MPLCONFIGDIR)" $(PYTHON_ENV)/bin/adhd-eeg-global \
@@ -43,7 +49,8 @@ smoke:
 		--folds 2 \
 		--random-state $(SEED) \
 		--max-subjects-per-class 5 \
-		--output "outputs/smoke_$(RUN_NAME)" $(EXTRA_ARGS)
+		--output "outputs/smoke_$(RUN_NAME)" \
+		--comparison-output "outputs/smoke_$(RUN_NAME)/comparison" $(EXTRA_ARGS)
 
 regions:
 	MPLCONFIGDIR="$(MPLCONFIGDIR)" $(PYTHON_ENV)/bin/adhd-eeg-three-regions \
@@ -62,3 +69,21 @@ regions-smoke:
 		--random-state $(SEED) \
 		--max-subjects-per-class 5 \
 		--output "outputs/smoke_$(REGION_RUN_NAME)" $(EXTRA_ARGS)
+
+single-regions:
+	MPLCONFIGDIR="$(MPLCONFIGDIR)" $(PYTHON_ENV)/bin/adhd-eeg-single-regions \
+		--data "$(DATA)" \
+		--models $(MODEL) $(SINGLE_REGION_ARGS) \
+		--folds $(FOLDS) \
+		--random-state $(SEED) \
+		--output "outputs/$(SINGLE_REGION_RUN_NAME)" $(EXTRA_ARGS)
+
+single-regions-smoke:
+	MPLCONFIGDIR="$(MPLCONFIGDIR)" $(PYTHON_ENV)/bin/adhd-eeg-single-regions \
+		--data "$(DATA)" \
+		--models $(MODEL) \
+		--regions $(if $(strip $(SINGLE_REGIONS)),$(SINGLE_REGIONS),frontal occipital) \
+		--folds 2 \
+		--random-state $(SEED) \
+		--max-subjects-per-class 5 \
+		--output "outputs/smoke_$(SINGLE_REGION_RUN_NAME)" $(EXTRA_ARGS)
