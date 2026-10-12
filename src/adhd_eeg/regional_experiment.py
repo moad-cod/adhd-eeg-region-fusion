@@ -25,14 +25,23 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(description="Compare all three-region ADHD EEG subsets")
     parser.add_argument("--data", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=Path("outputs/three_region_benchmark"))
-    parser.add_argument("--feature-cache", type=Path, default=Path("outputs/all_models/features.npz"))
+    parser.add_argument(
+        "--feature-cache",
+        type=Path,
+        default=Path("outputs/global_five_region_benchmark/features.npz"),
+    )
+    parser.add_argument(
+        "--comparison-root", type=Path, default=Path("outputs/comparisons")
+    )
     parser.add_argument(
         "--global-summary",
         type=Path,
-        default=Path("outputs/all_models/comparison/benchmark_summary.csv"),
+        default=Path("outputs/comparisons/global_models/benchmark_summary.csv"),
     )
     parser.add_argument(
-        "--global-metrics", type=Path, default=Path("outputs/all_models/metrics.json")
+        "--global-metrics",
+        type=Path,
+        default=Path("outputs/global_five_region_benchmark/metrics.json"),
     )
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--random-state", type=int, default=42)
@@ -198,7 +207,7 @@ def main(argv=None) -> None:
                 }
             )
 
-        comparison_dir = combination_dir / "comparison"
+        comparison_dir = combination_dir / "model_comparison"
         save_multi_model_roc(predictions, comparison_dir)
         save_benchmark_summary(predictions, comparison_dir)
         pd.concat(prediction_frames, ignore_index=True).to_csv(
@@ -207,9 +216,9 @@ def main(argv=None) -> None:
         _write_metrics_checkpoint(metrics_path, combination_metrics)
 
     summary = pd.DataFrame(rows)
-    comparison_dir = args.output / "comparison"
-    save_regional_summary(summary, comparison_dir)
-    save_region_heatmap(summary, comparison_dir)
+    regional_comparison_dir = args.comparison_root / "three_region_models"
+    save_regional_summary(summary, regional_comparison_dir)
+    save_region_heatmap(summary, regional_comparison_dir)
 
     if args.global_summary.exists() and args.max_subjects_per_class is None:
         _validate_global_configuration(args)
@@ -221,7 +230,9 @@ def main(argv=None) -> None:
                 + ", ".join(sorted(missing_models))
             )
         global_summary = global_summary[global_summary["model"].isin(args.models)]
-        compare_with_global(summary, global_summary, comparison_dir)
+        compare_with_global(
+            summary, global_summary, args.comparison_root / "feature_scopes"
+        )
     else:
         print("Skipped global comparison: matching full global results were not available.")
     print(f"Regional results written to {args.output}")
