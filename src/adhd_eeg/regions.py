@@ -14,6 +14,8 @@ REGION_CODES = {
     "O": "occipital",
 }
 
+SINGLE_REGIONS = tuple(REGION_CODES.values())
+
 THREE_REGION_COMBINATIONS = {
     "F-C-P": ("F", "C", "P"),
     "F-C-T": ("F", "C", "T"),
@@ -58,6 +60,28 @@ def select_combination_features(
     if int(mask.sum()) != expected:
         raise ValueError(
             f"{combination} selected {int(mask.sum())} features; expected {expected}"
+        )
+    return X[:, mask], names[mask], channels
+
+
+def select_region_features(
+    X: np.ndarray,
+    feature_names: Iterable[str],
+    region: str,
+) -> tuple[np.ndarray, np.ndarray, tuple[str, ...]]:
+    """Select all bandpower columns belonging to one anatomical region."""
+    if region not in SINGLE_REGIONS:
+        raise ValueError(f"Unknown EEG region: {region}")
+    names = np.asarray(list(feature_names), dtype=str)
+    if X.ndim != 2 or X.shape[1] != len(names):
+        raise ValueError("X columns and feature_names must have the same length")
+    channels = tuple(REGIONS[region])
+    channel_set = set(channels)
+    mask = np.asarray([name.rsplit("_", 1)[-1] in channel_set for name in names])
+    expected = len(channels) * len(BANDS)
+    if int(mask.sum()) != expected:
+        raise ValueError(
+            f"{region} selected {int(mask.sum())} features; expected {expected}"
         )
     return X[:, mask], names[mask], channels
 
