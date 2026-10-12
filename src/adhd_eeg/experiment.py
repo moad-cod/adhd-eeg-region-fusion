@@ -51,7 +51,15 @@ def cross_validate_model(model, X, y, groups, folds: int, random_state: int):
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description="Run the global 19-channel ADHD EEG baseline")
     parser.add_argument("--data", type=Path, required=True, help="Path to adhdata.csv")
-    parser.add_argument("--output", type=Path, default=Path("outputs/global"))
+    parser.add_argument(
+        "--output", type=Path, default=Path("outputs/global_five_region_benchmark")
+    )
+    parser.add_argument(
+        "--comparison-output",
+        type=Path,
+        default=Path("outputs/comparisons/global_models"),
+        help="Directory for consolidated cross-model summaries and figures",
+    )
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--random-state", type=int, default=42)
     parser.add_argument(
@@ -107,7 +115,7 @@ def main(argv=None) -> None:
     prediction_frames = []
     model_predictions = {}
     models_output_dir = args.output / "models"
-    comparison_output_dir = args.output / "comparison"
+    comparison_output_dir = args.comparison_output
     models = model_registry(args.random_state, args.models)
     for name in args.models:
         print(f"Evaluating {name}...")
